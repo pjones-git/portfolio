@@ -53,19 +53,12 @@ miniport/
 After enabling GitHub Pages, your website will be available at:
 **https://pjones-git.github.io/portfolio/**
 
-### GitHub Actions Deployment
-
-A GitHub Actions workflow is included that will automatically:
-- Build and deploy your site when you push changes
-- Ensure your website is always up to date
-- Handle the deployment process automatically
-
 ### Updating Your Live Website
 
 **Method 1: Direct Edit (Recommended for GitHub Pages)**
-1. Edit `index.html` directly in your repository
+1. Edit `index.html` directly in your repository (via GitHub web interface or locally)
 2. Commit and push changes to the main branch
-3. GitHub Actions will automatically deploy the updates
+3. GitHub Pages will automatically deploy the updates
 
 **Method 2: Local Development with Admin Interface**
 1. Clone the repository locally
