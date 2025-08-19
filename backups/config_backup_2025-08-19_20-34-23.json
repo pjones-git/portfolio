@@ -1,0 +1,38 @@
+{
+    "site": {
+        "title": "LEX Technical",
+        "meta_description": ""
+    },
+    "personal": {
+        "name": "Patrick",
+        "tagline": "",
+        "profile_image": "images\/pic00.jpg",
+        "cta_text": "Learn about what I do"
+    },
+    "work": {
+        "title": "",
+        "subtitle": "",
+        "footer_text": "",
+        "cta_text": "",
+        "services": []
+    },
+    "portfolio": {
+        "title": "",
+        "subtitle": "",
+        "footer_text": "",
+        "cta_text": "",
+        "items": []
+    },
+    "contact": {
+        "title": "",
+        "subtitle": "",
+        "form_action": "#",
+        "social_links": []
+    },
+    "navigation": [],
+    "copyright": {
+        "text": "",
+        "design_credit": "Design: HTML5 UP",
+        "design_url": "http:\/\/html5up.net"
+    }
+}

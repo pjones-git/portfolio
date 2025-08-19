@@ -1,0 +1,286 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Website Preview</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <style>
+        .preview-header {
+            background: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 3px solid #4acaa8;
+        }
+        .preview-header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        .preview-controls {
+            margin-top: 0.5rem;
+        }
+        .preview-controls button {
+            background: #4acaa8;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .preview-controls button:hover {
+            background: #3a9d84;
+        }
+        .preview-content {
+            margin-top: 100px; /* Account for fixed header */
+        }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: #e74c3c;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            margin: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-header">
+        <h1>🔍 Website Preview</h1>
+        <div class="preview-controls">
+            <button onclick="refreshPreview()">🔄 Refresh</button>
+            <button onclick="toggleFullscreen()">📺 Fullscreen</button>
+            <button onclick="window.close()">❌ Close</button>
+            <button onclick="window.open('admin.html', '_blank')">⚙️ Edit</button>
+        </div>
+    </div>
+
+    <div class="preview-content">
+        <div class="loading" id="loading">Loading preview...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="preview-container"></div>
+    </div>
+
+    <script>
+        let isFullscreen = false;
+
+        // Load and display the preview
+        async function loadPreview() {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const container = document.getElementById('preview-container');
+
+            try {
+                loading.style.display = 'block';
+                error.style.display = 'none';
+
+                // Load the current configuration
+                const configResponse = await fetch('content-config.json');
+                const config = await configResponse.json();
+
+                // Load the template
+                const templateResponse = await fetch('index-template.html');
+                let html = await templateResponse.text();
+
+                // Apply the configuration to the template
+                html = applyConfigToTemplate(html, config);
+
+                // Display the preview
+                container.innerHTML = html;
+
+                // Execute any scripts that might be in the HTML
+                executeScripts(container);
+
+                loading.style.display = 'none';
+
+            } catch (err) {
+                console.error('Preview loading error:', err);
+                loading.style.display = 'none';
+                error.style.display = 'block';
+                error.textContent = 'Error loading preview: ' + err.message;
+            }
+        }
+
+        // Apply configuration to template (client-side version of PHP functions)
+        function applyConfigToTemplate(html, config) {
+            // Site settings
+            html = html.replace(/{{SITE_TITLE}}/g, config.site?.title || 'Miniport by HTML5 UP');
+            html = html.replace(/{{META_DESCRIPTION}}/g, config.site?.meta_description || '');
+
+            // Personal information
+            html = html.replace(/{{PERSONAL_NAME}}/g, config.personal?.name || '');
+            html = html.replace(/{{PERSONAL_TAGLINE}}/g, config.personal?.tagline || '');
+            html = html.replace(/{{PROFILE_IMAGE}}/g, config.personal?.profile_image || 'images/pic00.jpg');
+            html = html.replace(/{{PERSONAL_CTA}}/g, config.personal?.cta_text || 'Learn about what I do');
+
+            // Work section
+            html = html.replace(/{{WORK_TITLE}}/g, config.work?.title || '');
+            html = html.replace(/{{WORK_SUBTITLE}}/g, config.work?.subtitle || '');
+            html = html.replace(/{{WORK_FOOTER}}/g, config.work?.footer_text || '');
+            html = html.replace(/{{WORK_CTA}}/g, config.work?.cta_text || '');
+
+            // Portfolio section
+            html = html.replace(/{{PORTFOLIO_TITLE}}/g, config.portfolio?.title || '');
+            html = html.replace(/{{PORTFOLIO_SUBTITLE}}/g, config.portfolio?.subtitle || '');
+            html = html.replace(/{{PORTFOLIO_FOOTER}}/g, config.portfolio?.footer_text || '');
+            html = html.replace(/{{PORTFOLIO_CTA}}/g, config.portfolio?.cta_text || '');
+
+            // Contact section
+            html = html.replace(/{{CONTACT_TITLE}}/g, config.contact?.title || '');
+            html = html.replace(/{{CONTACT_SUBTITLE}}/g, config.contact?.subtitle || '');
+            html = html.replace(/{{CONTACT_FORM_ACTION}}/g, config.contact?.form_action || '#');
+
+            // Copyright
+            html = html.replace(/{{COPYRIGHT_TEXT}}/g, config.copyright?.text || '');
+            html = html.replace(/{{DESIGN_CREDIT}}/g, config.copyright?.design_credit || 'Design: HTML5 UP');
+            html = html.replace(/{{DESIGN_URL}}/g, config.copyright?.design_url || 'http://html5up.net');
+
+            // Generate navigation
+            let navHtml = '';
+            if (config.navigation) {
+                config.navigation.forEach(item => {
+                    navHtml += `<li><a href="${escapeHtml(item.href)}">${escapeHtml(item.label)}</a></li>\n`;
+                });
+            }
+            html = html.replace(/{{NAVIGATION_ITEMS}}/g, navHtml);
+
+            // Generate services
+            let servicesHtml = '';
+            if (config.work?.services) {
+                config.work.services.forEach(service => {
+                    const iconClass = `icon ${service.icon_solid ? 'solid ' : ''}featured ${escapeHtml(service.icon)}`;
+                    servicesHtml += `
+                        <div class="col-4 col-6-medium col-12-small">
+                            <section class="box style1">
+                                <span class="${iconClass}"></span>
+                                <h3>${escapeHtml(service.title)}</h3>
+                                <p>${escapeHtml(service.description)}</p>
+                            </section>
+                        </div>
+                    `;
+                });
+            }
+            html = html.replace(/{{SERVICES_ITEMS}}/g, servicesHtml);
+
+            // Generate portfolio
+            let portfolioHtml = '';
+            if (config.portfolio?.items) {
+                config.portfolio.items.forEach(item => {
+                    portfolioHtml += `
+                        <div class="col-4 col-6-medium col-12-small">
+                            <article class="box style2">
+                                <a href="${escapeHtml(item.link)}" class="image featured"><img src="${escapeHtml(item.image)}" alt="" /></a>
+                                <h3><a href="${escapeHtml(item.link)}">${escapeHtml(item.title)}</a></h3>
+                                <p>${escapeHtml(item.description)}</p>
+                            </article>
+                        </div>
+                    `;
+                });
+            }
+            html = html.replace(/{{PORTFOLIO_ITEMS}}/g, portfolioHtml);
+
+            // Generate social links
+            let socialHtml = '';
+            if (config.contact?.social_links) {
+                config.contact.social_links.forEach(link => {
+                    socialHtml += `<li><a href="${escapeHtml(link.url)}" class="icon brands ${escapeHtml(link.icon)}"><span class="label">${escapeHtml(link.platform)}</span></a></li>\n`;
+                });
+            }
+            html = html.replace(/{{SOCIAL_LINKS}}/g, socialHtml);
+
+            return html;
+        }
+
+        // Execute scripts found in the HTML content
+        function executeScripts(container) {
+            const scripts = container.querySelectorAll('script');
+            scripts.forEach(script => {
+                if (script.src) {
+                    // External script - create new script element
+                    const newScript = document.createElement('script');
+                    newScript.src = script.src;
+                    newScript.async = false;
+                    document.head.appendChild(newScript);
+                } else {
+                    // Inline script - execute directly
+                    try {
+                        eval(script.innerHTML);
+                    } catch (e) {
+                        console.warn('Script execution failed:', e);
+                    }
+                }
+            });
+        }
+
+        // Utility function to escape HTML
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Refresh the preview
+        function refreshPreview() {
+            loadPreview();
+        }
+
+        // Toggle fullscreen mode
+        function toggleFullscreen() {
+            const header = document.querySelector('.preview-header');
+            const content = document.querySelector('.preview-content');
+
+            if (!isFullscreen) {
+                header.style.display = 'none';
+                content.style.marginTop = '0';
+                isFullscreen = true;
+            } else {
+                header.style.display = 'block';
+                content.style.marginTop = '100px';
+                isFullscreen = false;
+            }
+        }
+
+        // Initialize preview on load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPreview();
+            
+            // Auto-refresh every 30 seconds if window is focused
+            setInterval(() => {
+                if (!document.hidden) {
+                    loadPreview();
+                }
+            }, 30000);
+        });
+
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'r':
+                        e.preventDefault();
+                        refreshPreview();
+                        break;
+                    case 'f':
+                        e.preventDefault();
+                        toggleFullscreen();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

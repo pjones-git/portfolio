@@ -1,0 +1,75 @@
+{
+  "site": {
+    "title": "LEX Technical",
+    "meta_description": ""
+  },
+  "personal": {
+    "name": "Patrick M. Jones",
+    "tagline": "Tell visitors about yourself and what makes you unique.",
+    "profile_image": "images/pic00.jpg",
+    "cta_text": "Learn about what I do"
+  },
+  "work": {
+    "title": "Here's what I do.",
+    "subtitle": "Brief description of your services.",
+    "footer_text": "Ready to work together?",
+    "cta_text": "Portfolio",
+    "services": [
+      {
+        "title": "Web Development",
+        "description": "Creating modern, responsive websites and web applications.",
+        "icon": "fa-code",
+        "icon_solid": false
+      },
+      {
+        "title": "UI/UX Design",
+        "description": "Designing user-friendly interfaces and experiences.",
+        "icon": "fa-paint-brush",
+        "icon_solid": false
+      }
+    ]
+  },
+  "portfolio": {
+    "title": "",
+    "subtitle": "..using AWS Manage Services",
+    "footer_text": "Like what you see?",
+    "cta_text": "Get in touch with me",
+    "items": [
+      {
+        "title": "Deploying Search Engine",
+        "description": "Deploying a search engine using AWS Manage Services",
+        "image": "images/Picture1.png",
+        "link": "www.espn.com"
+      },
+      {
+        "title": "Project Two",
+        "description": "Description of your second project.",
+        "image": "images/pic02.jpg",
+        "link": "#"
+      }
+    ]
+  },
+  "contact": {
+    "title": "Get in touch with me.",
+    "subtitle": "Let's work together on something great.",
+    "form_action": "#",
+    "social_links": [
+      {
+        "platform": "Twitter",
+        "url": "https://twitter.com/",
+        "icon": "fa-twitter"
+      },
+      {
+        "platform": "LinkedIn",
+        "url": "https://linkedin.com/in/",
+        "icon": "fa-linkedin"
+      }
+    ]
+  },
+  "navigation": [],
+  "copyright": {
+    "text": "© Patrick. All rights reserved.",
+    "design_credit": "Design: HTML5 UP",
+    "design_url": "http://html5up.net"
+  }
+}

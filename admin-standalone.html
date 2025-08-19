@@ -1,0 +1,835 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Website Content Editor - Miniport</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <style>
+        .admin-container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 2rem; 
+            background: #fff;
+            margin-top: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .form-section { 
+            margin-bottom: 3rem; 
+            padding: 2rem; 
+            border: 1px solid #e1e1e1; 
+            border-radius: 8px; 
+            background: #f9f9f9;
+        }
+        .form-section h2 { 
+            color: #333; 
+            border-bottom: 2px solid #4acaa8; 
+            padding-bottom: 0.5rem; 
+            margin-bottom: 1.5rem;
+        }
+        .form-group { 
+            margin-bottom: 1.5rem; 
+        }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            font-weight: bold; 
+            color: #555;
+        }
+        .form-group input, .form-group textarea, .form-group select { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            font-size: 1rem;
+        }
+        .form-group textarea { 
+            resize: vertical; 
+            min-height: 100px; 
+        }
+        .repeater-item { 
+            background: #fff; 
+            padding: 1.5rem; 
+            margin-bottom: 1rem; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            position: relative;
+        }
+        .repeater-item h4 { 
+            margin-top: 0; 
+            color: #4acaa8;
+        }
+        .btn-remove { 
+            position: absolute; 
+            top: 10px; 
+            right: 10px; 
+            background: #e74c3c; 
+            color: white; 
+            border: none; 
+            padding: 5px 10px; 
+            border-radius: 3px; 
+            cursor: pointer;
+        }
+        .btn-add { 
+            background: #4acaa8; 
+            color: white; 
+            border: none; 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin-top: 1rem;
+        }
+        .btn-primary { 
+            background: #4acaa8; 
+            color: white; 
+            border: none; 
+            padding: 1rem 2rem; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+            margin-right: 1rem;
+        }
+        .btn-secondary { 
+            background: #95a5a6; 
+            color: white; 
+            border: none; 
+            padding: 1rem 2rem; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 1.1rem;
+        }
+        .form-actions { 
+            text-align: center; 
+            margin-top: 3rem; 
+            padding-top: 2rem; 
+            border-top: 2px solid #e1e1e1;
+        }
+        .form-actions button {
+            margin: 0.5rem;
+        }
+        .grid-2 { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 1rem; 
+        }
+        .grid-3 { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr 1fr; 
+            gap: 1rem; 
+        }
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+        }
+        .success-message, .error-message, .info-message {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+            display: none;
+        }
+        .success-message { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error-message { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info-message { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Website Content Editor</h1>
+        <div class="info-message" style="display: block;">
+            <strong>Quick Editor:</strong> This form is pre-populated with data from your current index.html file. Make changes below and click "🚀 Deploy to Site" to update your live website instantly.
+        </div>
+        
+        <div id="success-message" class="success-message"></div>
+        <div id="error-message" class="error-message"></div>
+
+        <form id="content-form">
+            <!-- Site Settings -->
+            <div class="form-section">
+                <h2>Site Settings</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="site-title">Site Title</label>
+                        <input type="text" id="site-title" name="site-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="meta-description">Meta Description</label>
+                        <input type="text" id="meta-description" name="meta-description">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="form-section">
+                <h2>Personal Information</h2>
+                <div class="form-group">
+                    <label for="personal-name">Your Name</label>
+                    <input type="text" id="personal-name" name="personal-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="personal-tagline">Personal Tagline/Bio</label>
+                    <textarea id="personal-tagline" name="personal-tagline" placeholder="Tell visitors about yourself"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="profile-image">Profile Image Path</label>
+                    <input type="text" id="profile-image" name="profile-image" placeholder="images/pic00.jpg">
+                    <small>Enter the path to your profile image file</small>
+                </div>
+                <div class="form-group">
+                    <label for="personal-cta">Call-to-Action Text</label>
+                    <input type="text" id="personal-cta" name="personal-cta" placeholder="e.g., Learn about what I do">
+                </div>
+            </div>
+
+            <!-- Work/Services Section -->
+            <div class="form-section">
+                <h2>Work/Services Section</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="work-title">Section Title</label>
+                        <input type="text" id="work-title" name="work-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="work-subtitle">Section Subtitle</label>
+                        <input type="text" id="work-subtitle" name="work-subtitle">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Services (You can have up to 6 services)</label>
+                    <div id="services-container">
+                        <!-- Services will be populated by JavaScript -->
+                    </div>
+                    <button type="button" class="btn-add" onclick="addService()">Add Service</button>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="work-footer">Footer Text</label>
+                        <input type="text" id="work-footer" name="work-footer">
+                    </div>
+                    <div class="form-group">
+                        <label for="work-cta">Call-to-Action Text</label>
+                        <input type="text" id="work-cta" name="work-cta">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Section -->
+            <div class="form-section">
+                <h2>Portfolio Section</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="portfolio-title">Section Title</label>
+                        <input type="text" id="portfolio-title" name="portfolio-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="portfolio-subtitle">Section Subtitle</label>
+                        <input type="text" id="portfolio-subtitle" name="portfolio-subtitle">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Portfolio Items</label>
+                    <div id="portfolio-container">
+                        <!-- Portfolio items will be populated by JavaScript -->
+                    </div>
+                    <button type="button" class="btn-add" onclick="addPortfolioItem()">Add Portfolio Item</button>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="portfolio-footer">Footer Text</label>
+                        <input type="text" id="portfolio-footer" name="portfolio-footer">
+                    </div>
+                    <div class="form-group">
+                        <label for="portfolio-cta">Call-to-Action Text</label>
+                        <input type="text" id="portfolio-cta" name="portfolio-cta">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="form-section">
+                <h2>Contact Section</h2>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label for="contact-title">Section Title</label>
+                        <input type="text" id="contact-title" name="contact-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-subtitle">Section Subtitle</label>
+                        <input type="text" id="contact-subtitle" name="contact-subtitle">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="contact-form-action">Contact Form Action URL</label>
+                    <input type="text" id="contact-form-action" name="contact-form-action" placeholder="e.g., mailto:your@email.com or contact.php">
+                </div>
+                
+                <div class="form-group">
+                    <label>Social Media Links</label>
+                    <div id="social-container">
+                        <!-- Social links will be populated by JavaScript -->
+                    </div>
+                    <button type="button" class="btn-add" onclick="addSocialLink()">Add Social Link</button>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="form-section">
+                <h2>Navigation</h2>
+                <div class="form-group">
+                    <label>Navigation Items</label>
+                    <div id="navigation-container">
+                        <!-- Navigation items will be populated by JavaScript -->
+                    </div>
+                    <button type="button" class="btn-add" onclick="addNavItem()">Add Navigation Item</button>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="form-section">
+                <h2>Footer/Copyright</h2>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label for="copyright-text">Copyright Text</label>
+                        <input type="text" id="copyright-text" name="copyright-text">
+                    </div>
+                    <div class="form-group">
+                        <label for="design-credit">Design Credit</label>
+                        <input type="text" id="design-credit" name="design-credit">
+                    </div>
+                    <div class="form-group">
+                        <label for="design-url">Design Credit URL</label>
+                        <input type="url" id="design-url" name="design-url">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn-primary" onclick="deployToSite()">🚀 Deploy to Site</button>
+                <button type="button" class="btn-secondary" onclick="resetForm()">Reset Form</button>
+            </div>
+        </form>
+
+    </div>
+
+    <script>
+        let serviceIndex = 0;
+        let portfolioIndex = 0;
+        let socialIndex = 0;
+        let navIndex = 0;
+
+        // Default configuration - load from server on page load
+        let currentConfig = {};
+
+        // Load configuration from server - try extract from index.html first, then config file
+        async function loadCurrentConfig() {
+            try {
+                // First try to extract data from existing index.html
+                const extractResponse = await fetch('extract-data.php');
+                if (extractResponse.ok) {
+                    const extractedData = await extractResponse.json();
+                    if (!extractedData.error) {
+                        currentConfig = extractedData;
+                        populateForm();
+                        showSuccess('Current site data loaded successfully from index.html!');
+                        return;
+                    }
+                }
+                
+                // Fallback to content-config.json if extraction fails
+                const response = await fetch('content-config.json');
+                if (response.ok) {
+                    currentConfig = await response.json();
+                    populateForm();
+                    showSuccess('Current configuration loaded successfully from config file!');
+                } else {
+                    throw new Error('Config file not found');
+                }
+            } catch (error) {
+                console.error('Could not load config:', error);
+                // Load default config if both methods fail
+                loadDefaultConfig();
+            }
+        }
+
+        // Default configuration fallback
+        function loadDefaultConfig() {
+            currentConfig = {
+                "site": {
+                    "title": "Miniport by HTML5 UP",
+                    "meta_description": "Personal portfolio website"
+                },
+                "personal": {
+                    "name": "Your Name",
+                    "tagline": "Tell visitors about yourself and what makes you unique.",
+                    "profile_image": "images/pic00.jpg",
+                    "cta_text": "Learn about what I do"
+                },
+                "work": {
+                    "title": "Here's what I do.",
+                    "subtitle": "Brief description of your services.",
+                    "services": [],
+                    "footer_text": "Ready to work together?",
+                    "cta_text": "See some of my recent work"
+                },
+                "portfolio": {
+                    "title": "Here's some of my recent work.",
+                    "subtitle": "A collection of projects I've worked on.",
+                    "items": [],
+                    "footer_text": "Like what you see?",
+                    "cta_text": "Get in touch with me"
+                },
+                "contact": {
+                    "title": "Get in touch with me.",
+                    "subtitle": "Let's work together on something great.",
+                    "form_action": "#",
+                    "social_links": []
+                },
+                "navigation": [
+                    {"label": "Top", "href": "#top"},
+                    {"label": "Work", "href": "#work"},
+                    {"label": "Portfolio", "href": "#portfolio"},
+                    {"label": "Contact", "href": "#contact"}
+                ],
+                "copyright": {
+                    "text": "© Your Name. All rights reserved.",
+                    "design_credit": "Design: HTML5 UP",
+                    "design_url": "http://html5up.net"
+                }
+            };
+            populateForm();
+            showSuccess('Default configuration loaded!');
+        }
+
+        // Populate form with current data
+        function populateForm() {
+            // Site settings
+            document.getElementById('site-title').value = currentConfig.site?.title || '';
+            document.getElementById('meta-description').value = currentConfig.site?.meta_description || '';
+            
+            // Personal info
+            document.getElementById('personal-name').value = currentConfig.personal?.name || '';
+            document.getElementById('personal-tagline').value = currentConfig.personal?.tagline || '';
+            document.getElementById('profile-image').value = currentConfig.personal?.profile_image || '';
+            document.getElementById('personal-cta').value = currentConfig.personal?.cta_text || '';
+            
+            // Work section
+            document.getElementById('work-title').value = currentConfig.work?.title || '';
+            document.getElementById('work-subtitle').value = currentConfig.work?.subtitle || '';
+            document.getElementById('work-footer').value = currentConfig.work?.footer_text || '';
+            document.getElementById('work-cta').value = currentConfig.work?.cta_text || '';
+            
+            // Portfolio section
+            document.getElementById('portfolio-title').value = currentConfig.portfolio?.title || '';
+            document.getElementById('portfolio-subtitle').value = currentConfig.portfolio?.subtitle || '';
+            document.getElementById('portfolio-footer').value = currentConfig.portfolio?.footer_text || '';
+            document.getElementById('portfolio-cta').value = currentConfig.portfolio?.cta_text || '';
+            
+            // Contact section
+            document.getElementById('contact-title').value = currentConfig.contact?.title || '';
+            document.getElementById('contact-subtitle').value = currentConfig.contact?.subtitle || '';
+            document.getElementById('contact-form-action').value = currentConfig.contact?.form_action || '';
+            
+            // Copyright
+            document.getElementById('copyright-text').value = currentConfig.copyright?.text || '';
+            document.getElementById('design-credit').value = currentConfig.copyright?.design_credit || '';
+            document.getElementById('design-url').value = currentConfig.copyright?.design_url || '';
+            
+            // Populate repeating sections
+            populateServices();
+            populatePortfolio();
+            populateSocialLinks();
+            populateNavigation();
+        }
+
+        // Services functions
+        function populateServices() {
+            const container = document.getElementById('services-container');
+            container.innerHTML = '';
+            serviceIndex = 0;
+            
+            if (currentConfig.work?.services) {
+                currentConfig.work.services.forEach(service => {
+                    addService(service);
+                });
+            }
+        }
+
+        function addService(data = null) {
+            const container = document.getElementById('services-container');
+            const index = serviceIndex++;
+            
+            const serviceDiv = document.createElement('div');
+            serviceDiv.className = 'repeater-item';
+            serviceDiv.innerHTML = `
+                <h4>Service ${index + 1}</h4>
+                <button type="button" class="btn-remove" onclick="removeService(this)">Remove</button>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>FontAwesome Icon Class</label>
+                        <input type="text" name="service-icon-${index}" value="${data?.icon || ''}" placeholder="e.g., fa-comments">
+                    </div>
+                    <div class="form-group">
+                        <label>Service Title</label>
+                        <input type="text" name="service-title-${index}" value="${data?.title || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="service-solid-${index}" ${data?.icon_solid ? 'checked' : ''}>
+                            Solid Icon Style
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Service Description</label>
+                    <textarea name="service-desc-${index}" required>${data?.description || ''}</textarea>
+                </div>
+            `;
+            
+            container.appendChild(serviceDiv);
+        }
+
+        function removeService(button) {
+            button.parentElement.remove();
+        }
+
+        // Portfolio functions
+        function populatePortfolio() {
+            const container = document.getElementById('portfolio-container');
+            container.innerHTML = '';
+            portfolioIndex = 0;
+            
+            if (currentConfig.portfolio?.items) {
+                currentConfig.portfolio.items.forEach(item => {
+                    addPortfolioItem(item);
+                });
+            }
+        }
+
+        function addPortfolioItem(data = null) {
+            const container = document.getElementById('portfolio-container');
+            const index = portfolioIndex++;
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'repeater-item';
+            itemDiv.innerHTML = `
+                <h4>Portfolio Item ${index + 1}</h4>
+                <button type="button" class="btn-remove" onclick="removePortfolioItem(this)">Remove</button>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Project Title</label>
+                        <input type="text" name="portfolio-title-${index}" value="${data?.title || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Project Link</label>
+                        <input type="url" name="portfolio-link-${index}" value="${data?.link || ''}" placeholder="https://...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Project Description</label>
+                    <textarea name="portfolio-desc-${index}" required>${data?.description || ''}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Project Image Path</label>
+                    <input type="text" name="portfolio-image-${index}" value="${data?.image || ''}" placeholder="images/pic01.jpg">
+                </div>
+            `;
+            
+            container.appendChild(itemDiv);
+        }
+
+        function removePortfolioItem(button) {
+            button.parentElement.remove();
+        }
+
+        // Social links functions
+        function populateSocialLinks() {
+            const container = document.getElementById('social-container');
+            container.innerHTML = '';
+            socialIndex = 0;
+            
+            if (currentConfig.contact?.social_links) {
+                currentConfig.contact.social_links.forEach(link => {
+                    addSocialLink(link);
+                });
+            }
+        }
+
+        function addSocialLink(data = null) {
+            const container = document.getElementById('social-container');
+            const index = socialIndex++;
+            
+            const linkDiv = document.createElement('div');
+            linkDiv.className = 'repeater-item';
+            linkDiv.innerHTML = `
+                <h4>Social Link ${index + 1}</h4>
+                <button type="button" class="btn-remove" onclick="removeSocialLink(this)">Remove</button>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Platform Name</label>
+                        <input type="text" name="social-platform-${index}" value="${data?.platform || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Profile URL</label>
+                        <input type="url" name="social-url-${index}" value="${data?.url || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>FontAwesome Icon</label>
+                        <input type="text" name="social-icon-${index}" value="${data?.icon || ''}" placeholder="e.g., fa-twitter">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(linkDiv);
+        }
+
+        function removeSocialLink(button) {
+            button.parentElement.remove();
+        }
+
+        // Navigation functions
+        function populateNavigation() {
+            const container = document.getElementById('navigation-container');
+            container.innerHTML = '';
+            navIndex = 0;
+            
+            if (currentConfig.navigation) {
+                currentConfig.navigation.forEach(item => {
+                    addNavItem(item);
+                });
+            }
+        }
+
+        function addNavItem(data = null) {
+            const container = document.getElementById('navigation-container');
+            const index = navIndex++;
+            
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'repeater-item';
+            itemDiv.innerHTML = `
+                <h4>Navigation Item ${index + 1}</h4>
+                <button type="button" class="btn-remove" onclick="removeNavItem(this)">Remove</button>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Menu Label</label>
+                        <input type="text" name="nav-label-${index}" value="${data?.label || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Link Target</label>
+                        <input type="text" name="nav-href-${index}" value="${data?.href || ''}" required placeholder="e.g., #section or https://...">
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(itemDiv);
+        }
+
+        function removeNavItem(button) {
+            button.parentElement.remove();
+        }
+
+        // Generate configuration from form data
+        function generateConfig() {
+            const formData = new FormData(document.getElementById('content-form'));
+            const config = {
+                site: {
+                    title: formData.get('site-title') || '',
+                    meta_description: formData.get('meta-description') || ''
+                },
+                personal: {
+                    name: formData.get('personal-name') || '',
+                    tagline: formData.get('personal-tagline') || '',
+                    profile_image: formData.get('profile-image') || 'images/pic00.jpg',
+                    cta_text: formData.get('personal-cta') || 'Learn about what I do'
+                },
+                work: {
+                    title: formData.get('work-title') || '',
+                    subtitle: formData.get('work-subtitle') || '',
+                    footer_text: formData.get('work-footer') || '',
+                    cta_text: formData.get('work-cta') || '',
+                    services: []
+                },
+                portfolio: {
+                    title: formData.get('portfolio-title') || '',
+                    subtitle: formData.get('portfolio-subtitle') || '',
+                    footer_text: formData.get('portfolio-footer') || '',
+                    cta_text: formData.get('portfolio-cta') || '',
+                    items: []
+                },
+                contact: {
+                    title: formData.get('contact-title') || '',
+                    subtitle: formData.get('contact-subtitle') || '',
+                    form_action: formData.get('contact-form-action') || '#',
+                    social_links: []
+                },
+                navigation: [],
+                copyright: {
+                    text: formData.get('copyright-text') || '',
+                    design_credit: formData.get('design-credit') || 'Design: HTML5 UP',
+                    design_url: formData.get('design-url') || 'http://html5up.net'
+                }
+            };
+
+            // Collect services
+            for (let i = 0; i < serviceIndex; i++) {
+                const title = formData.get(`service-title-${i}`);
+                const description = formData.get(`service-desc-${i}`);
+                const icon = formData.get(`service-icon-${i}`);
+                const iconSolid = formData.get(`service-solid-${i}`) === 'on';
+
+                if (title && description) {
+                    config.work.services.push({
+                        title: title,
+                        description: description,
+                        icon: icon || 'fa-star',
+                        icon_solid: iconSolid
+                    });
+                }
+            }
+
+            // Collect portfolio items
+            for (let i = 0; i < portfolioIndex; i++) {
+                const title = formData.get(`portfolio-title-${i}`);
+                const description = formData.get(`portfolio-desc-${i}`);
+                const image = formData.get(`portfolio-image-${i}`);
+                const link = formData.get(`portfolio-link-${i}`);
+
+                if (title && description) {
+                    config.portfolio.items.push({
+                        title: title,
+                        description: description,
+                        image: image || 'images/pic01.jpg',
+                        link: link || '#'
+                    });
+                }
+            }
+
+            // Collect social links
+            for (let i = 0; i < socialIndex; i++) {
+                const platform = formData.get(`social-platform-${i}`);
+                const url = formData.get(`social-url-${i}`);
+                const icon = formData.get(`social-icon-${i}`);
+
+                if (platform && url) {
+                    config.contact.social_links.push({
+                        platform: platform,
+                        url: url,
+                        icon: icon || 'fa-link'
+                    });
+                }
+            }
+
+            // Collect navigation items
+            for (let i = 0; i < navIndex; i++) {
+                const label = formData.get(`nav-label-${i}`);
+                const href = formData.get(`nav-href-${i}`);
+
+                if (label && href) {
+                    config.navigation.push({
+                        label: label,
+                        href: href
+                    });
+                }
+            }
+
+            return config;
+        }
+
+        // Reset form
+        function resetForm() {
+            if (confirm('Are you sure you want to reset the form? This will reload the current configuration from the server.')) {
+                loadCurrentConfig();
+            }
+        }
+
+        // Utility functions
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            document.getElementById('error-message').style.display = 'none';
+            
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+        // Deploy to site function
+        async function deployToSite() {
+            try {
+                // First generate the config to ensure we have the latest data
+                const config = generateConfig();
+                
+                showSuccess('Saving configuration...');
+                
+                // Save the config to the server using our save endpoint
+                const saveResponse = await fetch('save-config.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(config, null, 2)
+                });
+                
+                if (!saveResponse.ok) {
+                    const errorData = await saveResponse.text();
+                    throw new Error(`Failed to save configuration: ${errorData}`);
+                }
+                
+                showSuccess('Configuration saved. Deploying to site...');
+                
+                // Make a request to the deploy script
+                const response = await fetch('simple-deploy.php?regenerate=true', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.text();
+                    console.log('Deploy result:', result);
+                    
+                    // Try to parse as JSON first, fallback to text
+                    let resultData;
+                    try {
+                        resultData = JSON.parse(result);
+                        if (resultData.success) {
+                            showSuccess('🚀 Site deployed successfully! Your changes are now live.');
+                        } else {
+                            showError('Deployment failed: ' + (resultData.error || resultData.message));
+                        }
+                    } catch (e) {
+                        // If not JSON, check for success text
+                        if (result.includes('successfully')) {
+                            showSuccess('🚀 Site deployed successfully! Your changes are now live.');
+                        } else {
+                            showError('Deployment completed but with warnings: ' + result);
+                        }
+                    }
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}. ${errorText}`);
+                }
+            } catch (error) {
+                console.error('Deployment error:', error);
+                showError('Deployment failed: ' + error.message);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurrentConfig();
+        });
+    </script>
+</body>
+</html>
