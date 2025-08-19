@@ -1,15 +1,19 @@
-# Website Content Management System
+# Portfolio Website
 
-A comprehensive form-based content management system for the HTML5UP Miniport template. This system allows you to easily customize all aspects of your website through a user-friendly web interface.
+A modern, responsive portfolio website built with the Miniport template by HTML5 UP, featuring a custom admin interface for easy content management.
 
-## 🚀 Features
+## 🌐 Live Website
 
-- **Visual Content Editor**: Easy-to-use web form for editing all website content
-- **Dynamic Image Upload**: Upload and manage profile and portfolio images
-- **Live Preview**: See your changes before publishing
-- **Backup System**: Automatic backups with restore functionality
-- **Mobile Responsive**: Admin interface works on all devices
-- **Template System**: Clean separation of content and presentation
+Your portfolio will be hosted at: **https://pjones-git.github.io/portfolio/**
+
+## ✨ Features
+
+- **Responsive Design**: Mobile-friendly layout that looks great on all devices
+- **Admin Interface**: Easy-to-use content management system (for local development)
+- **Dynamic Content**: Update your portfolio without editing HTML
+- **Professional Layout**: Clean, modern design perfect for showcasing work
+- **GitHub Pages Hosting**: Automatic deployment with GitHub Actions
+- **SEO Optimized**: Meta tags and semantic HTML structure
 
 ## 📁 File Structure
 
@@ -31,9 +35,46 @@ miniport/
 └── images/                 # Original theme images
 ```
 
-## 🛠️ Setup Instructions
+## 🚀 GitHub Pages Hosting Setup
 
-### Prerequisites
+### Enable GitHub Pages (Quick Setup)
+
+1. **Go to your repository**: https://github.com/pjones-git/portfolio
+2. **Click "Settings"** tab (in the repository navigation)
+3. **Scroll to "Pages"** (in the left sidebar)
+4. **Under "Source"**, select:
+   - **Source**: Deploy from a branch
+   - **Branch**: main
+   - **Folder**: / (root)
+5. **Click "Save"**
+
+### Your Live Website
+
+After enabling GitHub Pages, your website will be available at:
+**https://pjones-git.github.io/portfolio/**
+
+### GitHub Actions Deployment
+
+A GitHub Actions workflow is included that will automatically:
+- Build and deploy your site when you push changes
+- Ensure your website is always up to date
+- Handle the deployment process automatically
+
+### Updating Your Live Website
+
+**Method 1: Direct Edit (Recommended for GitHub Pages)**
+1. Edit `index.html` directly in your repository
+2. Commit and push changes to the main branch
+3. GitHub Actions will automatically deploy the updates
+
+**Method 2: Local Development with Admin Interface**
+1. Clone the repository locally
+2. Use the PHP admin interface (see Local Development section below)
+3. Push the updated `index.html` to GitHub
+
+## 🛠️ Local Development Setup
+
+### Prerequisites (For Admin Interface)
 
 - Web server with PHP support (Apache, Nginx, etc.)
 - PHP 7.0 or higher
